@@ -11,7 +11,9 @@ from collections.abc import Sequence
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 
-def top_terms(reviews: Sequence[str], n: int = 15, max_features: int = 2000) -> list[tuple[str, float]]:
+def top_terms(
+    reviews: Sequence[str], n: int = 15, max_features: int = 2000
+) -> list[tuple[str, float]]:
     """Return the ``n`` highest mean-TF-IDF terms across the corpus.
 
     Args:
@@ -34,5 +36,5 @@ def top_terms(reviews: Sequence[str], n: int = 15, max_features: int = 2000) -> 
         return []
     means = matrix.mean(axis=0).A1
     terms = vec.get_feature_names_out()
-    ranked = sorted(zip(terms, means), key=lambda kv: kv[1], reverse=True)
+    ranked = sorted(zip(terms, means, strict=True), key=lambda kv: kv[1], reverse=True)
     return [(t, float(s)) for t, s in ranked[:n]]

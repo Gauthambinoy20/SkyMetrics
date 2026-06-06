@@ -12,7 +12,7 @@ def feature_importance(trained: TrainedModel) -> list[tuple[str, float]]:
     model's feature names.
     """
     importances = trained.model.feature_importances_
-    paired = zip(trained.feature_names, (float(i) for i in importances))
+    paired = zip(trained.feature_names, (float(i) for i in importances), strict=True)
     return sorted(paired, key=lambda kv: kv[1], reverse=True)
 
 
