@@ -15,6 +15,8 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
 from skymetrics import __version__
+from skymetrics.llm.client import LLMConfigError
+from skymetrics.llm.summarize import summarize_reviews
 from skymetrics.ml.persistence import load_model
 from skymetrics.ml.predict import predict_one
 from skymetrics.nlp import aspects
@@ -42,6 +44,12 @@ class ReviewIn(BaseModel):
 class SentimentOut(BaseModel):
     polarity: float
     label: str
+
+
+class ReviewsIn(BaseModel):
+    """Request body carrying a batch of reviews to summarise."""
+
+    reviews: list[str] = Field(..., min_length=1, description="Reviews to summarise")
 
 
 @app.get("/health")
@@ -84,3 +92,15 @@ def predict(features: dict[str, Any]) -> dict[str, Any]:
             detail=f"model not available at {MODEL_PATH}; run scripts/train_model.py",
         ) from exc
     return predict_one(model, features)
+
+
+@app.post("/summary")
+def summary(body: ReviewsIn) -> dict[str, str]:
+    """Summarise a batch of reviews with the LLM (top complaints/praise).
+
+    Returns a 503 if no LLM API key is configured.
+    """
+    try:
+        return {"summary": summarize_reviews(body.reviews)}
+    except LLMConfigError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
