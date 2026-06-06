@@ -62,6 +62,22 @@ def main() -> None:  # pragma: no cover - exercised manually / via screenshots
             except Exception as exc:  # pragma: no cover
                 st.info(f"Transformer unavailable: {exc}. Run `pip install transformers torch`.")
 
+    st.subheader("Ask the reviews (RAG)")
+    question = st.text_input("Ask a question about BA reviews", "What do customers say about food?")
+    if st.button("Ask") and question:  # pragma: no cover - network dependent
+        from skymetrics.llm.client import LLMConfigError
+        from skymetrics.llm.rag import ReviewRetriever, answer_question
+
+        try:
+            retriever = ReviewRetriever(scored["review"].tolist())
+            result = answer_question(question, retriever)
+            st.write(result["answer"])
+            with st.expander("Sources"):
+                for src in result["sources"]:
+                    st.caption(src)
+        except LLMConfigError:
+            st.info("Set OPENROUTER_API_KEY in .env to enable the chatbot.")
+
     st.subheader("Live British Airways flights")
     if st.button("Load live flights (OpenSky)"):
         try:

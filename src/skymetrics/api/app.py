@@ -16,6 +16,7 @@ from pydantic import BaseModel, Field
 
 from skymetrics import __version__
 from skymetrics.llm.client import LLMConfigError
+from skymetrics.llm.rag import ReviewRetriever, answer_question
 from skymetrics.llm.summarize import summarize_reviews
 from skymetrics.ml.persistence import load_model
 from skymetrics.ml.predict import predict_one
@@ -50,6 +51,14 @@ class ReviewsIn(BaseModel):
     """Request body carrying a batch of reviews to summarise."""
 
     reviews: list[str] = Field(..., min_length=1, description="Reviews to summarise")
+
+
+class ChatIn(BaseModel):
+    """Request body for a grounded question over a review corpus."""
+
+    question: str = Field(..., min_length=1)
+    reviews: list[str] = Field(..., min_length=1)
+    k: int = Field(5, ge=1, le=20)
 
 
 @app.get("/health")
@@ -102,5 +111,18 @@ def summary(body: ReviewsIn) -> dict[str, str]:
     """
     try:
         return {"summary": summarize_reviews(body.reviews)}
+    except LLMConfigError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+
+@app.post("/chat")
+def chat(body: ChatIn) -> dict[str, object]:
+    """Answer a question grounded in the supplied reviews (RAG).
+
+    Returns a 503 if no LLM API key is configured.
+    """
+    retriever = ReviewRetriever(body.reviews)
+    try:
+        return answer_question(body.question, retriever, k=body.k)
     except LLMConfigError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
