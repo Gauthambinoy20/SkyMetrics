@@ -71,10 +71,12 @@ def main() -> None:  # pragma: no cover - exercised manually / via screenshots
         try:
             retriever = ReviewRetriever(scored["review"].tolist())
             result = answer_question(question, retriever)
-            st.write(result["answer"])
+            st.write(str(result["answer"]))
+            sources = result["sources"]
             with st.expander("Sources"):
-                for src in result["sources"]:
-                    st.caption(src)
+                if isinstance(sources, list):
+                    for src in sources:
+                        st.caption(str(src))
         except LLMConfigError:
             st.info("Set OPENROUTER_API_KEY in .env to enable the chatbot.")
 
