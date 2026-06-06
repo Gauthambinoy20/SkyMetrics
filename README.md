@@ -77,9 +77,17 @@ pytest --cov=skymetrics --cov-report=term-missing
 
 59 tests · 91% coverage · all external calls mocked (no live network in tests).
 
+## The product
+
+Captured from the running app:
+
+| Streamlit dashboard | FastAPI docs |
+| --- | --- |
+| ![Dashboard](docs/screenshots/dashboard.png) | ![API](docs/screenshots/api_docs.png) |
+
 ## Results & screenshots
 
-Generated from real runs (see `ANALYSIS_OUTPUT/`):
+Generated from real analysis runs (see `ANALYSIS_OUTPUT/`):
 
 | Sentiment distribution | Top review terms |
 | --- | --- |
