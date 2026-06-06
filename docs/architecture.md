@@ -20,8 +20,11 @@ flowchart TB
 
     subgraph Core["Processing"]
         NLP["nlp/\nsentiment · aspects · topics · transformer"]
-        ML["ml/\nbooking · importance · model_card · persistence"]
+        ML["ml/\nbooking · predict · importance · model_card · persistence"]
+        LLM["llm/\nsummarize · rag (TF-IDF retrieval)"]
     end
+
+    OR["OpenRouter\n(free models)"]
 
     DB[("db/\nSQLite: reviews · bookings · metrics")]
 
@@ -39,6 +42,11 @@ flowchart TB
     NLP --> API
     NLP --> DASH
     ML --> API
+    DB --> LLM
+    LLM --> OR
+    LLM --> API
+    LLM --> DASH
+    OS --> API
     DB --> DASH
 ```
 

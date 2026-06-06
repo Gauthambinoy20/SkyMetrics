@@ -24,14 +24,31 @@ a proper package, API, dashboard, persistence layer and CI/CD pipeline.
 | Transformer sentiment (DistilBERT, lazy) | `nlp/transformer.py` |
 | Aspect-based sentiment (seat, food, staff, delay…) | `nlp/aspects.py` |
 | Topic / keyword mining (TF-IDF) | `nlp/topics.py` |
-| Booking-completion model (Random Forest) | `ml/booking.py` |
+| Booking-completion model (Random Forest) + serving | `ml/booking.py`, `ml/predict.py` |
 | Feature importance + model card | `ml/importance.py`, `ml/model_card.py` |
-| Model persistence | `ml/persistence.py` |
+| Model persistence + train script | `ml/persistence.py`, `scripts/train_model.py` |
 | Skytrax review scraper | `scrapers/skytrax.py` |
-| Live flights + IAG share price | `scrapers/external.py` |
+| Live BA flight tracking (OpenSky) + IAG share price | `scrapers/flights.py`, `scrapers/external.py` |
+| **LLM review summariser** (OpenRouter free) | `llm/summarize.py` |
+| **RAG chatbot over reviews** (TF-IDF + LLM) | `llm/rag.py` |
 | SQLite persistence | `db/` |
 | REST API | `api/app.py` |
 | Dashboard | `dashboard/app.py` |
+
+### API endpoints
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET | `/health` | liveness |
+| POST | `/sentiment` | baseline polarity + label |
+| POST | `/aspects` | per-aspect sentiment |
+| GET | `/flights/live` | airborne BA flights (OpenSky) |
+| POST | `/predict` | booking-completion prediction |
+| POST | `/summary` | LLM summary of reviews |
+| POST | `/chat` | grounded RAG answer over reviews |
+
+LLM endpoints (`/summary`, `/chat`) use OpenRouter free models and return `503`
+until `OPENROUTER_API_KEY` is set in `.env`.
 
 ## Architecture
 

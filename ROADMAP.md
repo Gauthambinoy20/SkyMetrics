@@ -19,9 +19,16 @@ tested airline-customer-intelligence product.
 - [x] 1.2 CI/CD pipeline (all gates green locally) .... 90%
 - [x] 1.3 Docs, diagrams, screenshots ................. 100%
 
+## Phase 2 — AI & live serving
+
+- [x] 2.0 Live BA flight tracking + map (OpenSky)
+- [x] 2.1 Booking model served via /predict + transformer toggle
+- [x] 2.2 LLM review summariser (OpenRouter free) + /summary
+- [x] 2.3 RAG chatbot over reviews + /chat
+
 ## Test status
 
-59 unit tests passing · 91% line coverage · network fully mocked.
+81 unit tests passing · network and LLM fully mocked (no API cost in CI).
 
 ## Known issues / limitations
 
@@ -34,10 +41,10 @@ tested airline-customer-intelligence product.
 
 ## Next
 
-- [ ] `/predict` endpoint serving the persisted booking model
 - [ ] Trustpilot + Reddit scrapers (same fetch/parse pattern as Skytrax)
 - [ ] Time-series sentiment trend + volume forecasting
 - [ ] Scheduled ETL populating the SQLite store
+- [ ] WebSocket live flight stream to the map
 
 ## ✍️ TODO: my words
 
