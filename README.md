@@ -1,154 +1,111 @@
-# British Airways Data Science Virtual Experience
+# SkyMetrics — Airline Customer Intelligence
 
-[![Python](https://img.shields.io/badge/python-3.9+-blue?logo=python)](https://python.org)
-[![Jupyter](https://img.shields.io/badge/jupyter-notebook-orange?logo=jupyter)](https://jupyter.org)
-[![Scikit-learn](https://img.shields.io/badge/scikit--learn-1.3+-blue?logo=scikit-learn)](https://scikit-learn.org)
-[![Forage](https://img.shields.io/badge/Forage-Certified-brightgreen)](https://www.theforage.com/virtual-experience/NjynCWzGSaWXQCxSX/british-airways/data-science-yqoz)
+[![CI](https://github.com/Gauthambinoy20/SkyMetrics/actions/workflows/ci.yml/badge.svg)](https://github.com/Gauthambinoy20/SkyMetrics/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/Gauthambinoy20/SkyMetrics/actions/workflows/codeql.yml/badge.svg)](https://github.com/Gauthambinoy20/SkyMetrics/actions/workflows/codeql.yml)
+[![Python](https://img.shields.io/badge/python-3.12-blue?logo=python)](https://python.org)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-> British Airways Data Science Virtual Experience Programme — NLP sentiment analysis of customer reviews and predictive ML modelling of customer buying behaviour.
+> An airline-customer-intelligence platform for British Airways: review
+> sentiment (baseline + transformer), aspect-based analysis, topic mining,
+> booking-completion prediction, live flight and share-price enrichment — served
+> through a FastAPI API and a Streamlit dashboard.
+
+SkyMetrics began as the **British Airways Data Science Virtual Experience**
+(Forage) and has been expanded into a fully tested, containerised product with
+a proper package, API, dashboard, persistence layer and CI/CD pipeline.
 
 ---
 
-## Overview
+## What it does
 
-This project was completed as part of the **British Airways Data Science Virtual Experience Programme** on Forage. British Airways (BA) is the flag carrier airline of the United Kingdom, serving over 30 million passengers annually. The programme covers two real-world data science tasks that mirror the kind of work BA's data science team performs.
+| Capability | Module |
+| --- | --- |
+| Baseline sentiment (TextBlob) | `nlp/sentiment.py` |
+| Transformer sentiment (DistilBERT, lazy) | `nlp/transformer.py` |
+| Aspect-based sentiment (seat, food, staff, delay…) | `nlp/aspects.py` |
+| Topic / keyword mining (TF-IDF) | `nlp/topics.py` |
+| Booking-completion model (Random Forest) | `ml/booking.py` |
+| Feature importance + model card | `ml/importance.py`, `ml/model_card.py` |
+| Model persistence | `ml/persistence.py` |
+| Skytrax review scraper | `scrapers/skytrax.py` |
+| Live flights + IAG share price | `scrapers/external.py` |
+| SQLite persistence | `db/` |
+| REST API | `api/app.py` |
+| Dashboard | `dashboard/app.py` |
 
----
+## Architecture
 
-## Programme Tasks
+See [docs/architecture.md](docs/architecture.md) for the full set of diagrams
+(architecture, data-flow, sequence, ER). High level:
 
-### Task 1: Web Scraping & Customer Sentiment Analysis
-
-Scraped **3,917 customer reviews** from [Skytrax](https://www.airlinequality.com/airline-reviews/british-airways) (60 pages × 300 reviews) to understand how customers feel about British Airways.
-
-**Process:**
-- Web scraping with `BeautifulSoup` + `requests`
-- Text cleaning and preprocessing (removing noise, stopwords)
-- Sentiment scoring with `TextBlob`
-- Word frequency analysis and word cloud generation
-
-**Key Findings:**
-
-| Sentiment | Count | Percentage |
-|---|---|---|
-| Positive | 2,707 | 69% |
-| Negative/Neutral | 1,210 | 31% |
-
-**Visualisations produced:**
-- Sentiment distribution bar chart
-- Word cloud of most frequent review terms
-- Top 10 most common words across all reviews
-- Word count distribution
-
----
-
-### Task 2: Predictive Modelling — Customer Buying Behaviour
-
-Built machine learning models to predict whether a customer will **complete a flight booking**, using a dataset of **50,000 customer records** with 14 features.
-
-**Dataset features:** `num_passengers`, `sales_channel`, `trip_type`, `purchase_lead`, `length_of_stay`, `flight_hour`, `flight_day`, `route`, `booking_origin`, `wants_extra_baggage`, `wants_preferred_seat`, `wants_in_flight_meals`, `flight_duration`, `booking_complete`
-
-**Models trained:**
-
-| Model | Test Accuracy | Notes |
-|---|---|---|
-| Random Forest | **85.6%** | 100 estimators, class_weight='balanced' |
-| XGBoost | Compared | Gradient boosting baseline |
-| Neural Network | Compared | Sequential Keras model, 20 epochs |
-
-**Cross-validation (5-fold):** 56.3% ± 18.1%
-
-**Feature Importance (SHAP analysis):**
-The XGBoost SHAP values revealed that `purchase_lead`, `flight_duration`, and `length_of_stay` were the strongest predictors of booking completion.
-
-**Visualisations produced:**
-- Random Forest vs XGBoost accuracy comparison
-- Neural network training accuracy curve
-- XGBoost feature importance plot
-- SHAP summary plot and SHAP importance rankings
-
----
-
-## Analysis Output
-
-Key visualisations are saved in `ANALYSIS_OUTPUT/`:
-
-| File | Description |
-|---|---|
-| `SENTIMENT DISTRIBUTION.png` | Positive vs negative review breakdown |
-| `WORD CLOUD – REVIEWS.png` | Most frequent words in customer reviews |
-| `TOP 10 WORDS.png` | Bar chart of top 10 review terms |
-| `WORD COUNT DISTRIBUTION.png` | Distribution of review lengths |
-| `RANDOM FOREST AND XGBOOST.png` | Model accuracy comparison |
-| `NEURAL NETWORK TRAINING ACCURACY.png` | Training curve over 20 epochs |
-| `XGBOOST IMPORTANCE IN PREDICTING BOOKING COMPLETION.png` | Feature importances |
-| `XGBOOST SHAP IMPORTANCE.png` | SHAP-based feature ranking |
-| `XGBOOST SHAP SUMMARY PLOT.png` | SHAP beeswarm summary |
-
----
-
-## Tech Stack
-
-| Category | Tools |
-|---|---|
-| Language | Python 3.9+ |
-| Data Analysis | Pandas, NumPy |
-| Machine Learning | Scikit-learn, XGBoost, TensorFlow/Keras |
-| Explainability | SHAP |
-| NLP | NLTK, TextBlob |
-| Visualisation | Matplotlib, Seaborn, WordCloud |
-| Web Scraping | BeautifulSoup4, Requests |
-| Notebook | Jupyter |
-
----
-
-## Project Structure
-
-```
-british-airways-data-science/
-├── Data Analysis/
-│   ├── getting_started.ipynb       # Task 1: Scraping + sentiment analysis
-│   └── data/
-│       ├── BA_reviews.csv          # Raw scraped reviews
-│       ├── cleaned_BA_reviews.csv  # Cleaned reviews
-│       └── BA_reviews_tokenized.csv
-├── AI Modelling/
-│   ├── Getting Started - Task 2 Prediction Analysis.ipynb  # Task 2: ML modelling
-│   └── data/
-│       └── customer_booking.csv    # 50,000 booking records
-├── ANALYSIS_OUTPUT/                # All generated charts and plots
-├── CERTIFICATE/
-│   └── British_Airways_AI_Certificate.pdf
-├── requirements.txt
-└── README.md
+```text
+sources → scrapers → SQLite → nlp/ml → FastAPI + Streamlit
 ```
 
----
-
-## Getting Started
+## Setup
 
 ```bash
-git clone https://github.com/gauthambinoy/ba-insights-airline-analytics.git
-cd ba-insights-airline-analytics
-
-pip install -r requirements.txt
-
-# Task 1 — Sentiment Analysis
-jupyter notebook "Data Analysis/getting_started.ipynb"
-
-# Task 2 — Predictive Modelling
-jupyter notebook "AI Modelling/Getting Started - Task 2 Prediction Analysis.ipynb"
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements-dev.txt
+pip install -e .
 ```
 
----
+## Run
 
-## Certificate
+```bash
+# API
+uvicorn skymetrics.api.app:app --reload
+# Dashboard
+streamlit run src/skymetrics/dashboard/app.py
+# Everything in containers
+docker compose up --build
+```
 
-Completed and certified by [British Airways via Forage](https://www.theforage.com/virtual-experience/NjynCWzGSaWXQCxSX/british-airways/data-science-yqoz). Certificate available in `CERTIFICATE/`.
+Example API call:
 
----
+```bash
+curl -X POST localhost:8000/sentiment -H 'Content-Type: application/json' \
+  -d '{"text":"wonderful crew, smooth flight"}'
+# {"polarity":0.9,"label":"positive"}
+```
+
+## Test
+
+```bash
+pytest --cov=skymetrics --cov-report=term-missing
+```
+
+59 tests · 91% coverage · all external calls mocked (no live network in tests).
+
+## Results & screenshots
+
+Generated from real runs (see `ANALYSIS_OUTPUT/`):
+
+| Sentiment distribution | Top review terms |
+| --- | --- |
+| ![Sentiment](ANALYSIS_OUTPUT/SENTIMENT%20DISTRIBUTION.png) | ![Top words](ANALYSIS_OUTPUT/TOP%2010%20WORDS.png) |
+
+| Random Forest vs XGBoost | Neural-net training |
+| --- | --- |
+| ![RF vs XGB](ANALYSIS_OUTPUT/RANDOM%20FOREST%20AND%20XGBOOST.png) | ![NN](ANALYSIS_OUTPUT/NEURAL%20NETWORK%20TRAINING%20ACCURACY.png) |
+
+SHAP feature attribution:
+
+![SHAP](ANALYSIS_OUTPUT/XGBOOST%20SHAP%20SUMMARY%20PLOT.png)
+
+**Key findings:** 69% of 3,917 Skytrax reviews are positive; the Random Forest
+predicts booking completion at ~85.6% test accuracy, with `purchase_lead`,
+`flight_duration` and `length_of_stay` the strongest drivers.
+
+## Roadmap
+
+See [ROADMAP.md](ROADMAP.md). Tests green, CI green, fully containerised.
+
+## ✍️ TODO: my words
+
+> Why I built it this way, what I learned, and the trade-offs I'd defend in an
+> interview — to be written in my own words.
 
 ## License
 
-[MIT](LICENSE) © Gautham Binoy
+MIT — see [LICENSE](LICENSE).
