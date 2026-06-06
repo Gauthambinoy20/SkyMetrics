@@ -15,8 +15,11 @@ DEFAULT_MODEL = "distilbert-base-uncased-finetuned-sst-2-english"
 class TransformerSentiment:
     """Wraps a text-classification pipeline returning normalised results."""
 
-    def __init__(self, pipeline: Callable[[str], list[dict[str, Any]]] | None = None,
-                 model: str = DEFAULT_MODEL):
+    def __init__(
+        self,
+        pipeline: Callable[[str], list[dict[str, Any]]] | None = None,
+        model: str = DEFAULT_MODEL,
+    ):
         self._pipeline = pipeline
         self._model = model
 

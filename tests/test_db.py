@@ -17,8 +17,7 @@ def conn():
 class TestSchema:
     def test_tables_created(self, conn):
         names = {
-            r["name"]
-            for r in conn.execute("SELECT name FROM sqlite_master WHERE type='table'")
+            r["name"] for r in conn.execute("SELECT name FROM sqlite_master WHERE type='table'")
         }
         assert {"reviews", "bookings", "metrics"} <= names
 
@@ -36,9 +35,7 @@ class TestLoaders:
         assert row["source"] == "trustpilot"
 
     def test_load_bookings(self, conn):
-        df = pd.DataFrame(
-            {"route": ["AKLDEL"], "purchase_lead": [30], "booking_complete": [1]}
-        )
+        df = pd.DataFrame({"route": ["AKLDEL"], "purchase_lead": [30], "booking_complete": [1]})
         assert loaders.load_bookings(conn, df) == 1
         assert loaders.count_rows(conn, "bookings") == 1
 
