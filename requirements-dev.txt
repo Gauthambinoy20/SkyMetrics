@@ -1,7 +1,7 @@
 # Development & CI tooling (pinned).
 -r requirements.txt
 
-pytest==8.4.2
+pytest==9.0.3
 pytest-cov==6.0.0
 nbval==0.11.0
 httpx==0.28.1
