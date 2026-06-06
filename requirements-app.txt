@@ -1,0 +1,15 @@
+# Slim runtime for the containerised services (API + dashboard).
+# Excludes TensorFlow and Jupyter, which the served apps do not need, to keep
+# the image small. Pinned to match requirements.txt.
+pandas==3.0.3
+numpy==2.4.6
+scikit-learn==1.9.0
+joblib==1.5.3
+textblob==0.20.0
+beautifulsoup4==4.14.3
+requests==2.34.2
+fastapi==0.136.3
+uvicorn==0.49.0
+pydantic==2.13.4
+streamlit==1.58.0
+matplotlib==3.10.9
