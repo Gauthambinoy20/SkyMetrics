@@ -54,6 +54,13 @@ def main() -> None:  # pragma: no cover - exercised manually / via screenshots
     sample = st.text_area("Paste a review", "The crew were great but the food was cold.")
     if sample:
         st.json(aspect_sentiment(sample))
+        if st.checkbox("Compare with transformer model (requires transformers)"):
+            try:  # pragma: no cover - optional heavy dependency
+                from skymetrics.nlp.transformer import TransformerSentiment
+
+                st.json(TransformerSentiment().classify(sample))
+            except Exception as exc:  # pragma: no cover
+                st.info(f"Transformer unavailable: {exc}. Run `pip install transformers torch`.")
 
     st.subheader("Live British Airways flights")
     if st.button("Load live flights (OpenSky)"):

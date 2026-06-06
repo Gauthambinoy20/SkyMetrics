@@ -7,13 +7,28 @@ aspect model, so the API starts instantly and stays testable.
 
 from __future__ import annotations
 
-from fastapi import FastAPI
+import os
+from functools import lru_cache
+from typing import Any
+
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
 from skymetrics import __version__
+from skymetrics.ml.persistence import load_model
+from skymetrics.ml.predict import predict_one
 from skymetrics.nlp import aspects
 from skymetrics.nlp.sentiment import classify_sentiment, polarity_score
 from skymetrics.scrapers.flights import live_ba_flights
+
+MODEL_PATH = os.environ.get("SKYMETRICS_MODEL_PATH", "models/booking.joblib")
+
+
+@lru_cache(maxsize=1)
+def _get_model():
+    """Lazily load the persisted booking model (cached)."""
+    return load_model(MODEL_PATH)
+
 
 app = FastAPI(title="SkyMetrics API", version=__version__)
 
@@ -53,3 +68,19 @@ def flights_live() -> dict[str, object]:
     """Return airborne British Airways flights from the OpenSky Network."""
     flights = live_ba_flights()
     return {"count": len(flights), "flights": flights}
+
+
+@app.post("/predict")
+def predict(features: dict[str, Any]) -> dict[str, Any]:
+    """Predict booking completion for a record of booking features.
+
+    Returns a 503 if no trained model artifact is available.
+    """
+    try:
+        model = _get_model()
+    except FileNotFoundError as exc:
+        raise HTTPException(
+            status_code=503,
+            detail=f"model not available at {MODEL_PATH}; run scripts/train_model.py",
+        ) from exc
+    return predict_one(model, features)
