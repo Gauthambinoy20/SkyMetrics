@@ -29,6 +29,16 @@ def sentiment_summary(scored: pd.DataFrame) -> dict[str, float]:
     }
 
 
+def flights_to_map_df(flights: list[dict]) -> pd.DataFrame:
+    """Convert live-flight dicts into a ``lat``/``lon`` frame for ``st.map``."""
+    rows = [
+        {"lat": f["latitude"], "lon": f["longitude"], "callsign": f.get("callsign", "")}
+        for f in flights
+        if f.get("latitude") is not None and f.get("longitude") is not None
+    ]
+    return pd.DataFrame(rows, columns=["lat", "lon", "callsign"])
+
+
 def benchmark_airlines(df: pd.DataFrame) -> pd.DataFrame:
     """Compare mean polarity and positive share across airlines.
 

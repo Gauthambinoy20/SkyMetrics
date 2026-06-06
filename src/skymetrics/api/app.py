@@ -13,6 +13,7 @@ from pydantic import BaseModel, Field
 from skymetrics import __version__
 from skymetrics.nlp import aspects
 from skymetrics.nlp.sentiment import classify_sentiment, polarity_score
+from skymetrics.scrapers.flights import live_ba_flights
 
 app = FastAPI(title="SkyMetrics API", version=__version__)
 
@@ -45,3 +46,10 @@ def sentiment(body: ReviewIn) -> SentimentOut:
 def aspect_breakdown(body: ReviewIn) -> dict[str, dict[str, float]]:
     """Return per-aspect sentiment for a review."""
     return {"aspects": aspects.aspect_sentiment(body.text)}
+
+
+@app.get("/flights/live")
+def flights_live() -> dict[str, object]:
+    """Return airborne British Airways flights from the OpenSky Network."""
+    flights = live_ba_flights()
+    return {"count": len(flights), "flights": flights}

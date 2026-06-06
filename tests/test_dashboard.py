@@ -41,3 +41,18 @@ class TestBenchmark:
     def test_benchmark_missing_columns_raises(self):
         with pytest.raises(KeyError):
             data.benchmark_airlines(pd.DataFrame({"airline": ["BA"]}))
+
+
+class TestFlightsMap:
+    def test_flights_to_map_df_keeps_coords(self):
+        flights = [
+            {"callsign": "BAW1", "latitude": 51.4, "longitude": -0.4},
+            {"callsign": "BAW2", "latitude": None, "longitude": None},
+        ]
+        df = data.flights_to_map_df(flights)
+        assert list(df.columns) == ["lat", "lon", "callsign"]
+        assert len(df) == 1
+        assert df.iloc[0]["callsign"] == "BAW1"
+
+    def test_flights_to_map_df_empty(self):
+        assert len(data.flights_to_map_df([])) == 0

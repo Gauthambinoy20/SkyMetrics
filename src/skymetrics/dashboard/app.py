@@ -11,9 +11,10 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
-from skymetrics.dashboard.data import scored_reviews, sentiment_summary
+from skymetrics.dashboard.data import flights_to_map_df, scored_reviews, sentiment_summary
 from skymetrics.nlp.aspects import aspect_sentiment
 from skymetrics.nlp.topics import top_terms
+from skymetrics.scrapers.flights import live_ba_flights
 
 DEFAULT_DATA = Path("notebooks/data_analysis/data/cleaned_BA_reviews.csv")
 
@@ -53,6 +54,15 @@ def main() -> None:  # pragma: no cover - exercised manually / via screenshots
     sample = st.text_area("Paste a review", "The crew were great but the food was cold.")
     if sample:
         st.json(aspect_sentiment(sample))
+
+    st.subheader("Live British Airways flights")
+    if st.button("Load live flights (OpenSky)"):
+        try:
+            flights = live_ba_flights()
+            st.caption(f"{len(flights)} BA aircraft airborne now")
+            st.map(flights_to_map_df(flights))
+        except Exception as exc:  # pragma: no cover - network dependent
+            st.warning(f"Could not load live flights: {exc}")
 
 
 if __name__ == "__main__":  # pragma: no cover
